@@ -19,7 +19,7 @@ const memberSchema = new Schema<MemberDocument>(
       type: Schema.Types.ObjectId,
       ref: "Role",
       required: true,
-    }
+    },
     joinedAt: {
       type: Date,
       default: Date.now,
