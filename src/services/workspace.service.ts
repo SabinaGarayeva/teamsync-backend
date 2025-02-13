@@ -6,6 +6,8 @@ import WorkspaceModel from "../models/workspace.model";
 import { NotFoundException } from "../utils/appError";
 import MemberModel from "../models/member.model";
 
+// Create a new Workspace
+
 export const createWorkspaceService = async (
   userId: string,
   body: {
@@ -45,4 +47,16 @@ export const createWorkspaceService = async (
   return {
     workspace,
   };
+};
+
+// Get workspaces user is member
+export const getAllWorkspacesUserIsMemberService = async (userId: string) => {
+  const membership = await MemberModel.find({ userId })
+    .populate("workspaceId")
+    .select("-password")
+    .exec();
+
+  // Extract workspace details from membership
+  const workspaces = membership.map((membership) => membership.workspaceId);
+  return { workspaces };
 };

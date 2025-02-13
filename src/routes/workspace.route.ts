@@ -1,11 +1,9 @@
 import { Router } from "express";
-import { createWorkspaceController } from "../controllers/workspace.controller";
-
-
+import { createWorkspaceController, getAllWorkspacesUserIsMemberController } from "../controllers/workspace.controller";
 
 const workspaceRoutes = Router();
 
-
 workspaceRoutes.post("/create/new", createWorkspaceController);
+workspaceRoutes.post("all", getAllWorkspacesUserIsMemberController);
 
 export default workspaceRoutes;
