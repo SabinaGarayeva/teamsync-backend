@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   changeWorkspaceMemberRoleController,
   createWorkspaceController,
+  deleteWorkspaceByIdController,
   getAllWorkspacesUserIsMemberController,
   getWorkspaceAnalyticsController,
   getWorkspaceByIdController,
@@ -19,6 +20,9 @@ workspaceRoutes.put(
   "/change/member/role/:id",
   changeWorkspaceMemberRoleController
 );
+
+workspaceRoutes.delete("/delete/:id", deleteWorkspaceByIdController);
+
 
 workspaceRoutes.get("/all", getAllWorkspacesUserIsMemberController);
 workspaceRoutes.get("/members/:id", getWorkspaceMembersController);
