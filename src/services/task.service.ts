@@ -160,3 +160,29 @@ export const getAllTasksService = async (
     },
   };
 };
+
+export const getTaskByIdService = async (
+  workspaceId: string,
+  projectId: string,
+  taskId: string
+) => {
+  const project = await ProjectModel.findById(projectId);
+
+  if (!project || project.workspace.toString() !== workspaceId.toString()) {
+    throw new NotFoundException(
+      "Project not found or does not belong to this workspace"
+    );
+  }
+
+  const task = await TaskModel.findOne({
+    _id: taskId,
+    workspace: workspaceId,
+    project: projectId,
+  }).populate("assignedTo", "_id name profilePicture -password");
+
+  if (!task) {
+    throw new Error("Task not found");
+  }
+
+  return task;
+};

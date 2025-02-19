@@ -13,6 +13,7 @@ import { Permissions } from "../enums/role.enum";
 import {
   createTaskService,
   getAllTasksService,
+  getTaskByIdService,
   updateTaskService,
 } from "../services/task.service";
 import { HTTPSTATUS } from "../config/http.config";
@@ -92,6 +93,28 @@ export const getAllTasksController = asyncHandler(
     return res.status(HTTPSTATUS.OK).json({
       message: "All tasks fetched successfully",
       ...result,
+    });
+  }
+);
+
+export const getTaskByIdController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+
+    const taskId = taskIdSchema.parse(req.params.id);
+
+    const projectId = projectIdSchema.parse(req.params.projectId);
+
+    const workspaceId = workspaceIdSchema.parse(req.params.workspaceId);
+
+    const { role } = await getMemberRoleInWorkspace(userId, workspaceId);
+    roleGuard(role, [Permissions.VIEW_ONLY]);
+
+    const task = await getTaskByIdService(workspaceId, projectId, taskId);
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Task fetched successfully",
+      task,
     });
   }
 );
