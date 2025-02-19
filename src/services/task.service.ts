@@ -181,8 +181,25 @@ export const getTaskByIdService = async (
   }).populate("assignedTo", "_id name profilePicture -password");
 
   if (!task) {
-    throw new Error("Task not found");
+    throw new NotFoundException("Task not found");
   }
 
   return task;
+};
+
+export const deleteTaskService = async (
+  workspaceId: string,
+  taskId: string
+) => {
+  const task = await TaskModel.findByIdAndDelete({
+    _id: taskId,
+    workspace: workspaceId,
+  });
+
+  if (!task) {
+    throw new NotFoundException(
+      "Task not found or does not belong to specified workspace"
+    );
+  }
+  return;
 };
