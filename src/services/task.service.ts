@@ -2,7 +2,7 @@ import { TaskPriorityEnum, TaskStatusEnum } from "../enums/task.enum";
 import MemberModel from "../models/member.model";
 import ProjectModel from "../models/projects.model";
 import TaskModel from "../models/task.model";
-import { NotFoundException } from "../utils/appError";
+import { BadRequestException, NotFoundException } from "../utils/appError";
 
 export const createTaskService = async (
   workspaceId: string,
@@ -50,4 +50,41 @@ export const createTaskService = async (
   });
   await task.save();
   return { task };
+};
+
+export const updateTaskService = async (
+  workspaceId: string,
+  projectId: string,
+  taskId: string,
+  body: {
+    title: string;
+    description?: string;
+    priority: string;
+    status: string;
+    assignedTo?: string | null;
+    dueDate?: string;
+  }
+) => {
+  const project = await ProjectModel.findById(projectId);
+
+  if (!project || project.workspace.toString() !== workspaceId.toString()) {
+    ("Project not found or does not belong to this workspace");
+  }
+
+  const task = await TaskModel.findById(taskId);
+
+  if (!task || task.project.toString() !== projectId.toString()) {
+    ("Task not found or does not belong to this project");
+  }
+
+  const updatedTask = await TaskModel.findByIdAndUpdate(
+    taskId,
+    { ...body },
+    { new: true }
+  );
+  if (!updatedTask) {
+    throw new BadRequestException("Failed to find task");
+  }
+
+  return { updatedTask };
 };
