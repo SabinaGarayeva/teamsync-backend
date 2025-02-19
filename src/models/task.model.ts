@@ -5,7 +5,7 @@ import {
   TaskStatusEnum,
   TaskStatusEnumType,
 } from "../enums/task.enum";
-import { generateInviteCode } from "../utils/uuid";
+import { generateTaskCode } from "../utils/uuid";
 
 export interface TaskDocument extends Document {
   taskCode: string;
@@ -27,7 +27,7 @@ const taskSchema = new Schema<TaskDocument>(
     taskCode: {
       type: String,
       unique: true,
-      default: generateInviteCode,
+      default: generateTaskCode,
     },
     title: {
       type: String,
@@ -36,8 +36,8 @@ const taskSchema = new Schema<TaskDocument>(
     },
     description: {
       type: String,
-      default: null,
       trim: true,
+      default: null,
     },
     project: {
       type: Schema.Types.ObjectId,
