@@ -25,11 +25,13 @@ export const getMemberRoleInWorkspace = async (
 
   if (!member) {
     throw new UnauthorizedException(
-      "Your are not a member of this workspace",
+      "You are not a member of this workspace",
       ErrorCodeEnum.ACCESS_UNAUTHORIZED
     );
   }
+
   const roleName = member.role?.name;
+
   return { role: roleName };
 };
 
@@ -38,15 +40,12 @@ export const joinWorkspaceByInviteService = async (
   inviteCode: string
 ) => {
   // Find workspace by invite code
-
   const workspace = await WorkspaceModel.findOne({ inviteCode }).exec();
-
   if (!workspace) {
     throw new NotFoundException("Invalid invite code or workspace not found");
   }
 
   // Check if user is already a member
-
   const existingMember = await MemberModel.findOne({
     userId,
     workspaceId: workspace._id,
@@ -62,14 +61,12 @@ export const joinWorkspaceByInviteService = async (
     throw new NotFoundException("Role not found");
   }
 
-  // Add user to the workspace as a member
-
+  // Add user to workspace as a member
   const newMember = new MemberModel({
     userId,
     workspaceId: workspace._id,
     role: role._id,
   });
-
   await newMember.save();
 
   return { workspaceId: workspace._id, role: role.name };

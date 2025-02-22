@@ -6,9 +6,10 @@ import { config } from "./config/app.config";
 import connectDatabase from "./config/database.config";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
 import { HTTPSTATUS } from "./config/http.config";
-import { asyncHandler } from "./middlewares/asyncHandlerMiddleware";
+import { asyncHandler } from "./middlewares/asyncHandler.middleware";
 import { BadRequestException } from "./utils/appError";
 import { ErrorCodeEnum } from "./enums/error-code.enum";
+
 import "./config/passport.config";
 import passport from "passport";
 import authRoutes from "./routes/auth.route";
@@ -31,7 +32,7 @@ app.use(
     name: "session",
     keys: [config.SESSION_SECRET],
     maxAge: 24 * 60 * 60 * 1000,
-    secure: process.env.NODE_ENV === "production",
+    secure: config.NODE_ENV === "production",
     httpOnly: true,
     sameSite: "lax",
   })
@@ -54,7 +55,7 @@ app.get(
       "This is a bad request",
       ErrorCodeEnum.AUTH_INVALID_TOKEN
     );
-    res.status(HTTPSTATUS.OK).json({
+    return res.status(HTTPSTATUS.OK).json({
       message: "Hello Subscribe to the channel & share",
     });
   })
@@ -70,6 +71,6 @@ app.use(`${BASE_PATH}/task`, isAuthenticated, taskRoutes);
 app.use(errorHandler);
 
 app.listen(config.PORT, async () => {
-  console.log(`Server is running on port ${config.PORT} in ${config.NODE_ENV}`);
+  console.log(`Server listening on port ${config.PORT} in ${config.NODE_ENV}`);
   await connectDatabase();
 });

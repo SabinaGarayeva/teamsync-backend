@@ -4,7 +4,7 @@ import {
   deleteProjectController,
   getAllProjectsInWorkspaceController,
   getProjectAnalyticsController,
-  getProjectByIdWorkspaceController,
+  getProjectByIdAndWorkspaceIdController,
   updateProjectController,
 } from "../controllers/project.controller";
 
@@ -34,7 +34,7 @@ projectRoutes.get(
 
 projectRoutes.get(
   "/:id/workspace/:workspaceId",
-  getProjectByIdWorkspaceController
+  getProjectByIdAndWorkspaceIdController
 );
 
 export default projectRoutes;

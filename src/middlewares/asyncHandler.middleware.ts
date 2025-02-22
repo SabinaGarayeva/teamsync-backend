@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 
-type AsyncControllerType = (
+type AyncControllerType = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => Promise<any>;
 
 export const asyncHandler =
-  (controller: AsyncControllerType): AsyncControllerType =>
+  (controller: AyncControllerType): AyncControllerType =>
   async (req, res, next) => {
     try {
       await controller(req, res, next);

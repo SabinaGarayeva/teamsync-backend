@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import ProjectModel from "../models/projects.model";
+import ProjectModel from "../models/project.model";
 import TaskModel from "../models/task.model";
 import { NotFoundException } from "../utils/appError";
 import { TaskStatusEnum } from "../enums/task.enum";
@@ -20,16 +20,18 @@ export const createProjectService = async (
     workspace: workspaceId,
     createdBy: userId,
   });
+
   await project.save();
+
   return { project };
 };
 
-export const getAllProjectsInWorkspaceService = async (
+export const getProjectsInWorkspaceService = async (
   workspaceId: string,
   pageSize: number,
   pageNumber: number
 ) => {
-  // 1. Finding all projects in the workspace
+  // Step 1: Find all projects in the workspace
 
   const totalCount = await ProjectModel.countDocuments({
     workspace: workspaceId,
@@ -50,7 +52,7 @@ export const getAllProjectsInWorkspaceService = async (
   return { projects, totalCount, totalPages, skip };
 };
 
-export const getProjectByIdWorkspaceService = async (
+export const getProjectByIdAndWorkspaceIdService = async (
   workspaceId: string,
   projectId: string
 ) => {
@@ -79,9 +81,10 @@ export const getProjectAnalyticsService = async (
       "Project not found or does not belong to this workspace"
     );
   }
+
   const currentDate = new Date();
 
-  // using mongoose aggregate
+  //USING Mongoose aggregate
   const taskAnalytics = await TaskModel.aggregate([
     {
       $match: {
@@ -106,11 +109,11 @@ export const getProjectAnalyticsService = async (
         ],
         completedTasks: [
           {
-            $match: { status: "DONE" },
+            $match: {
+              status: TaskStatusEnum.DONE,
+            },
           },
-          {
-            $count: "count",
-          },
+          { $count: "count" },
         ],
       },
     },
@@ -124,7 +127,9 @@ export const getProjectAnalyticsService = async (
     completedTasks: _analytics.completedTasks[0]?.count || 0,
   };
 
-  return { analytics };
+  return {
+    analytics,
+  };
 };
 
 export const updateProjectService = async (
@@ -148,11 +153,13 @@ export const updateProjectService = async (
       "Project not found or does not belong to the specified workspace"
     );
   }
+
   if (emoji) project.emoji = emoji;
   if (name) project.name = name;
   if (description) project.description = description;
 
   await project.save();
+
   return { project };
 };
 

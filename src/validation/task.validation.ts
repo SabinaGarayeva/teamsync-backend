@@ -2,7 +2,6 @@ import { z } from "zod";
 import { TaskPriorityEnum, TaskStatusEnum } from "../enums/task.enum";
 
 export const titleSchema = z.string().trim().min(1).max(255);
-
 export const descriptionSchema = z.string().trim().optional();
 
 export const assignedToSchema = z.string().trim().min(1).nullable().optional();
@@ -24,7 +23,7 @@ export const dueDateSchema = z
       return !val || !isNaN(Date.parse(val));
     },
     {
-      message: "Invalid date format. Please provide a valid date string",
+      message: "Invalid date format. Please provide a valid date string.",
     }
   );
 

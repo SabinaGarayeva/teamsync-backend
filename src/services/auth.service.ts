@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 import UserModel from "../models/user.model";
 import AccountModel from "../models/account.model";
 import WorkspaceModel from "../models/workspace.model";
-import { Roles } from "../enums/role.enum";
 import RoleModel from "../models/roles-permission.model";
+import { Roles } from "../enums/role.enum";
 import {
   BadRequestException,
   NotFoundException,
@@ -25,17 +25,19 @@ export const loginOrCreateAccountService = async (data: {
 
   try {
     session.startTransaction();
-    console.log("Started session...");
+    console.log("Started Session...");
+
     let user = await UserModel.findOne({ email }).session(session);
 
     if (!user) {
-      //Create a new user if it doesn't exist
+      // Create a new user if it doesn't exist
       user = new UserModel({
         email,
         name: displayName,
         profilePicture: picture || null,
       });
       await user.save({ session });
+
       const account = new AccountModel({
         userId: user._id,
         provider: provider,
@@ -43,13 +45,14 @@ export const loginOrCreateAccountService = async (data: {
       });
       await account.save({ session });
 
-      // Create a new workplace forthe new user
+      // 3. Create a new workspace for the new user
       const workspace = new WorkspaceModel({
-        name: "My Workspace",
+        name: `My Workspace`,
         description: `Workspace created for ${user.name}`,
         owner: user._id,
       });
       await workspace.save({ session });
+
       const ownerRole = await RoleModel.findOne({
         name: Roles.OWNER,
       }).session(session);
@@ -59,18 +62,20 @@ export const loginOrCreateAccountService = async (data: {
       }
 
       const member = new MemberModel({
-        useId: user._id,
+        userId: user._id,
         workspaceId: workspace._id,
         role: ownerRole._id,
         joinedAt: new Date(),
       });
       await member.save({ session });
+
       user.currentWorkspace = workspace._id as mongoose.Types.ObjectId;
       await user.save({ session });
     }
     await session.commitTransaction();
     session.endSession();
     console.log("End Session...");
+
     return { user };
   } catch (error) {
     await session.abortTransaction();
@@ -81,7 +86,7 @@ export const loginOrCreateAccountService = async (data: {
   }
 };
 
-export const registerUserSerice = async (body: {
+export const registerUserService = async (body: {
   email: string;
   name: string;
   password: string;
@@ -93,7 +98,6 @@ export const registerUserSerice = async (body: {
     session.startTransaction();
 
     const existingUser = await UserModel.findOne({ email }).session(session);
-
     if (existingUser) {
       throw new BadRequestException("Email already exists");
     }
@@ -110,15 +114,14 @@ export const registerUserSerice = async (body: {
       provider: ProviderEnum.EMAIL,
       providerId: email,
     });
-
     await account.save({ session });
 
+    // 3. Create a new workspace for the new user
     const workspace = new WorkspaceModel({
-      name: "My Workspace",
+      name: `My Workspace`,
       description: `Workspace created for ${user.name}`,
       owner: user._id,
     });
-
     await workspace.save({ session });
 
     const ownerRole = await RoleModel.findOne({
@@ -135,7 +138,6 @@ export const registerUserSerice = async (body: {
       role: ownerRole._id,
       joinedAt: new Date(),
     });
-
     await member.save({ session });
 
     user.currentWorkspace = workspace._id as mongoose.Types.ObjectId;
@@ -144,10 +146,15 @@ export const registerUserSerice = async (body: {
     await session.commitTransaction();
     session.endSession();
     console.log("End Session...");
-    return { userId: user._id, workspaceId: workspace._id };
+
+    return {
+      userId: user._id,
+      workspaceId: workspace._id,
+    };
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
+
     throw error;
   }
 };
@@ -163,8 +170,9 @@ export const verifyUserService = async ({
 }) => {
   const account = await AccountModel.findOne({ provider, providerId: email });
   if (!account) {
-    throw new NotFoundException("Invalid email or password provided");
+    throw new NotFoundException("Invalid email or password");
   }
+
   const user = await UserModel.findById(account.userId);
 
   if (!user) {
@@ -175,5 +183,6 @@ export const verifyUserService = async ({
   if (!isMatch) {
     throw new UnauthorizedException("Invalid email or password");
   }
-  return user.omitPassword()
+
+  return user.omitPassword();
 };

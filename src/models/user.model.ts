@@ -19,7 +19,7 @@ const userSchema = new Schema<UserDocument>(
   {
     name: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     email: {
@@ -29,10 +29,7 @@ const userSchema = new Schema<UserDocument>(
       trim: true,
       lowercase: true,
     },
-    password: {
-      type: String,
-      select: true,
-    },
+    password: { type: String, select: true },
     profilePicture: {
       type: String,
       default: null,
@@ -69,5 +66,4 @@ userSchema.methods.comparePassword = async function (value: string) {
 };
 
 const UserModel = mongoose.model<UserDocument>("User", userSchema);
-
 export default UserModel;

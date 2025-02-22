@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from "mongoose";
 
 export interface ProjectDocument extends Document {
   name: string;
-  description: string | null;
+  description: string | null; // Optional description for the project
   emoji: string;
   workspace: mongoose.Types.ObjectId;
   createdBy: mongoose.Types.ObjectId;
@@ -23,10 +23,7 @@ const projectSchema = new Schema<ProjectDocument>(
       trim: true,
       default: "📊",
     },
-    description: {
-      type: String,
-      required: false,
-    },
+    description: { type: String, required: false },
     workspace: {
       type: Schema.Types.ObjectId,
       ref: "Workspace",
@@ -44,5 +41,4 @@ const projectSchema = new Schema<ProjectDocument>(
 );
 
 const ProjectModel = mongoose.model<ProjectDocument>("Project", projectSchema);
-
 export default ProjectModel;

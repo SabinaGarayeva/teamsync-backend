@@ -9,6 +9,7 @@ export const getCurrentUserService = async (userId: string) => {
   if (!user) {
     throw new BadRequestException("User not found");
   }
+
   return {
     user,
   };

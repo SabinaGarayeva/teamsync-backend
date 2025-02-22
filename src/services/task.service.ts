@@ -1,6 +1,6 @@
 import { TaskPriorityEnum, TaskStatusEnum } from "../enums/task.enum";
 import MemberModel from "../models/member.model";
-import ProjectModel from "../models/projects.model";
+import ProjectModel from "../models/project.model";
 import TaskModel from "../models/task.model";
 import { BadRequestException, NotFoundException } from "../utils/appError";
 
@@ -26,17 +26,16 @@ export const createTaskService = async (
       "Project not found or does not belong to this workspace"
     );
   }
-
   if (assignedTo) {
     const isAssignedUserMember = await MemberModel.exists({
       userId: assignedTo,
       workspaceId,
     });
+
     if (!isAssignedUserMember) {
-      throw new Error("Assigned user is not a member of this workspace");
+      throw new Error("Assigned user is not a member of this workspace.");
     }
   }
-
   const task = new TaskModel({
     title,
     description,
@@ -48,7 +47,9 @@ export const createTaskService = async (
     project: projectId,
     dueDate,
   });
+
   await task.save();
+
   return { task };
 };
 
@@ -68,22 +69,29 @@ export const updateTaskService = async (
   const project = await ProjectModel.findById(projectId);
 
   if (!project || project.workspace.toString() !== workspaceId.toString()) {
-    ("Project not found or does not belong to this workspace");
+    throw new NotFoundException(
+      "Project not found or does not belong to this workspace"
+    );
   }
 
   const task = await TaskModel.findById(taskId);
 
   if (!task || task.project.toString() !== projectId.toString()) {
-    ("Task not found or does not belong to this project");
+    throw new NotFoundException(
+      "Task not found or does not belong to this project"
+    );
   }
 
   const updatedTask = await TaskModel.findByIdAndUpdate(
     taskId,
-    { ...body },
+    {
+      ...body,
+    },
     { new: true }
   );
+
   if (!updatedTask) {
-    throw new BadRequestException("Failed to find task");
+    throw new BadRequestException("Failed to update task");
   }
 
   return { updatedTask };
@@ -99,7 +107,6 @@ export const getAllTasksService = async (
     keyword?: string;
     dueDate?: string;
   },
-
   pagination: {
     pageSize: number;
     pageNumber: number;
@@ -135,7 +142,7 @@ export const getAllTasksService = async (
     };
   }
 
-  // Pagination Setup
+  //Pagination Setup
   const { pageSize, pageNumber } = pagination;
   const skip = (pageNumber - 1) * pageSize;
 
@@ -148,13 +155,15 @@ export const getAllTasksService = async (
       .populate("project", "_id emoji name"),
     TaskModel.countDocuments(query),
   ]);
+
   const totalPages = Math.ceil(totalCount / pageSize);
 
   return {
     tasks,
     pagination: {
       pageSize,
-      pageNumber: totalCount,
+      pageNumber,
+      totalCount,
       totalPages,
       skip,
     },
@@ -181,7 +190,7 @@ export const getTaskByIdService = async (
   }).populate("assignedTo", "_id name profilePicture -password");
 
   if (!task) {
-    throw new NotFoundException("Task not found");
+    throw new NotFoundException("Task not found.");
   }
 
   return task;
@@ -191,15 +200,16 @@ export const deleteTaskService = async (
   workspaceId: string,
   taskId: string
 ) => {
-  const task = await TaskModel.findByIdAndDelete({
+  const task = await TaskModel.findOneAndDelete({
     _id: taskId,
     workspace: workspaceId,
   });
 
   if (!task) {
     throw new NotFoundException(
-      "Task not found or does not belong to specified workspace"
+      "Task not found or does not belong to the specified workspace"
     );
   }
+
   return;
 };

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../middlewares/asyncHandlerMiddleware";
+import { asyncHandler } from "../middlewares/asyncHandler.middleware";
 import { z } from "zod";
 import { HTTPSTATUS } from "../config/http.config";
 import { joinWorkspaceByInviteService } from "../services/member.service";

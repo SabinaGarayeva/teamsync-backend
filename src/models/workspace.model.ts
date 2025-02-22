@@ -6,8 +6,8 @@ export interface WorkspaceDocument extends Document {
   description: string;
   owner: mongoose.Types.ObjectId;
   inviteCode: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const workspaceSchema = new Schema<WorkspaceDocument>(
@@ -16,7 +16,7 @@ const workspaceSchema = new Schema<WorkspaceDocument>(
     description: { type: String, required: false },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "User", // Reference to User model (the workspace creator)
       required: true,
     },
     inviteCode: {

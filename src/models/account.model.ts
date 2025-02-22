@@ -3,7 +3,7 @@ import { ProviderEnum, ProviderEnumType } from "../enums/account-provider.enum";
 
 export interface AccountDocument extends Document {
   provider: ProviderEnumType;
-  providerId: string;
+  providerId: string; // Store the email, googleId, facebookId as the providerId
   userId: mongoose.Types.ObjectId;
   refreshToken: string | null;
   tokenExpiry: Date | null;
@@ -27,26 +27,18 @@ const accountSchema = new Schema<AccountDocument>(
       required: true,
       unique: true,
     },
-    refreshToken: {
-      type: String,
-      default: null,
-    },
-    tokenExpiry: {
-      type: Date,
-      default: null,
-    },
+    refreshToken: { type: String, default: null },
+    tokenExpiry: { type: Date, default: null },
   },
   {
     timestamps: true,
     toJSON: {
-      transform: (doc, ret) => {
+      transform(doc, ret) {
         delete ret.refreshToken;
       },
     },
   }
 );
 
-const AccountModel = mongoose.model<AccountDocument>("Account", accountSchema)
-
+const AccountModel = mongoose.model<AccountDocument>("Account", accountSchema);
 export default AccountModel;
-

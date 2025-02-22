@@ -1,7 +1,8 @@
-import { Request } from "express";
 import passport from "passport";
+import { Request } from "express";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as LocalStrategy } from "passport-local";
+
 import { config } from "./app.config";
 import { NotFoundException } from "../utils/appError";
 import { ProviderEnum } from "../enums/account-provider.enum";
@@ -9,7 +10,6 @@ import {
   loginOrCreateAccountService,
   verifyUserService,
 } from "../services/auth.service";
-import { verify } from "crypto";
 
 passport.use(
   new GoogleStrategy(
@@ -28,6 +28,7 @@ passport.use(
         if (!googleId) {
           throw new NotFoundException("Google ID (sub) is missing");
         }
+
         const { user } = await loginOrCreateAccountService({
           provider: ProviderEnum.GOOGLE,
           displayName: profile.displayName,
@@ -61,10 +62,5 @@ passport.use(
   )
 );
 
-passport.serializeUser((user: any, done) => {
-  done(null, user);
-});
-
-passport.deserializeUser((user: any, done) => {
-  done(null, user);
-});
+passport.serializeUser((user: any, done) => done(null, user));
+passport.deserializeUser((user: any, done) => done(null, user));

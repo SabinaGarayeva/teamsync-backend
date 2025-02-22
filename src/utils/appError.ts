@@ -1,5 +1,5 @@
 import { HTTPSTATUS, HttpStatusCodeType } from "../config/http.config";
-import { ErrorCodeEnumType, ErrorCodeEnum } from "../enums/error-code.enum";
+import { ErrorCodeEnum, ErrorCodeEnumType } from "../enums/error-code.enum";
 
 export class AppError extends Error {
   public statusCode: HttpStatusCodeType;
@@ -51,7 +51,7 @@ export class NotFoundException extends AppError {
 }
 
 export class BadRequestException extends AppError {
-  constructor(message = "Bad request", errorCode?: ErrorCodeEnumType) {
+  constructor(message = "Bad Request", errorCode?: ErrorCodeEnumType) {
     super(
       message,
       HTTPSTATUS.BAD_REQUEST,
@@ -61,7 +61,7 @@ export class BadRequestException extends AppError {
 }
 
 export class UnauthorizedException extends AppError {
-  constructor(message = "Unauthorized Accesss", errorCode?: ErrorCodeEnumType) {
+  constructor(message = "Unauthorized Access", errorCode?: ErrorCodeEnumType) {
     super(
       message,
       HTTPSTATUS.UNAUTHORIZED,
