@@ -15,7 +15,7 @@ const defaults: SignOptions = {
 };
 
 export const accessTokenSignOptions: SignOptsAndSecret = {
-  expiresIn: config.JWT_EXPIRES_IN,
+  expiresIn: config.JWT_EXPIRES_IN as SignOptions["expiresIn"], // Type casting
   secret: config.JWT_SECRET,
 };
 
