@@ -78,7 +78,7 @@ export const loginController = asyncHandler(
         });
       }
     )(req, res, next);
-  }
+  } 
 );
 
 export const logOutController = asyncHandler(
